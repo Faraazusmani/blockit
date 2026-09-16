@@ -99,12 +99,13 @@
   .month-grid .month-task,.month-grid .month-item{font-size:7.5px!important;line-height:1.2}
 }
 .idea-card .rich-content{line-clamp:4}
+.profile-btn{width:40px;padding:0;font-size:18px}.auth-status{font-size:11px;color:var(--muted);margin-top:4px}.auth-copy{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.auth-error{color:var(--red);font-size:12px;min-height:16px}.account-email{font-size:14px;font-weight:700;overflow-wrap:anywhere}.account-note{font-size:12px;color:var(--muted);line-height:1.5}.auth-switch{color:var(--blue);font-size:12px;font-weight:700}.auth-danger{color:var(--red);border-color:#f0c9c5;background:#fff7f6}
 </style>
 </head>
 <body>
 <div class="app" id="app">
 <aside class="sidebar"><div class="brand"><div class="brandmark">B</div><strong>Block It</strong></div><div class="navgroup"><div class="navlabel">Workspace</div><button class="nav active" data-view="home"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg></span>Home</button><button class="nav" data-view="plan"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M8 14h2M14 14h2M8 18h2"/></svg></span>Plan</button><button class="nav" data-view="do"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="m7.5 12 3 3 6-6"/></svg></span>Do</button><button class="nav" data-view="review"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17"/><path d="M7 16v-4M11 16V8M15 16V5M19 16v-7"/></svg></span>Review</button></div><div class="navgroup"><div class="navlabel">Library</div><button class="nav" data-view="notes"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12a2 2 0 0 1 2 2v14l-4 2-4-2-4 2-4-2V5a2 2 0 0 1 2-2Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>Notes</button><button class="nav" data-view="think"><span class="ico">✦</span>Think</button></div><div class="sidebar-bottom"><button class="capture-mini" id="captureBtn">＋ Quick Capture</button><div class="shortcut">Ctrl/Cmd + K · Command palette</div></div></aside>
-<main class="main"><header class="topbar"><div class="top-left"><div class="top-title" id="topTitle"></div><div class="crumb" id="topCrumb"></div></div><div class="top-actions"><button class="iconbtn" id="searchBtn" title="Command palette">⌘</button><button class="iconbtn today-top" id="todayBtn">Today</button><button class="iconbtn" id="focusIndicator" style="display:none">00:00</button><button class="blockbtn" id="blockBtn">Block</button></div></header>
+<main class="main"><header class="topbar"><div class="top-left"><div class="top-title" id="topTitle"></div><div class="crumb" id="topCrumb"></div></div><div class="top-actions"><button class="iconbtn" id="searchBtn" title="Command palette">⌘</button><button class="iconbtn today-top" id="todayBtn">Today</button><button class="iconbtn" id="focusIndicator" style="display:none">00:00</button><button class="blockbtn" id="blockBtn">Block</button><button class="iconbtn profile-btn" id="profileBtn" title="Account">◯</button></div></header>
 <section class="content">
 <div class="view active" id="view-home"><div class="eyebrow" id="homeDate"></div><div class="h1">Welcome</div><div class="sub">Turn what matters into time you can actually use.</div><div class="section home-grid"><div class="hero"><div class="eyebrow">Today</div><div id="homeTimeline"></div></div><div><div class="sectionhead"><h2>Needs attention</h2><span class="link" id="attentionCount"></span></div><div class="attention" id="attention"></div><div class="section"><div class="sectionhead"><h2>This week</h2><span class="link">Consistency</span></div><div class="stats" id="homeStats"></div></div></div></div><div class="section"><div class="sectionhead"><h2>Upcoming</h2><button class="link" data-go="plan">See calendar</button></div><div class="stats" id="upcoming"></div></div></div>
 <div class="view" id="view-plan"><div class="eyebrow">Plan</div><div class="calendar-title" id="calendarTitle"></div><div class="calendar-toolbar"><div class="calendar-left"><div class="navarrows"><button class="arrow" id="prevPeriod">‹</button><button class="arrow" id="nextPeriod">›</button></div><button class="today" id="calendarToday">Today</button><button class="today reset-calendar" id="resetCalendarBtn">Reset calendar</button></div><div class="seg" id="calendarSeg"><button data-cal="day">Day</button><button class="active" data-cal="week">Week</button><button data-cal="month">Month</button><button data-cal="year">Year</button></div></div><div id="calendarArea"></div></div>
@@ -125,10 +126,18 @@
 <div class="overlay" id="resetDataConfirmModal"><div class="modal small"><div class="modalhead"><div><div class="eyebrow">Reset data</div><h2 style="margin:4px 0 0">Do you wish to delete all the data?</h2></div><button class="x" data-close>×</button></div><div class="modalactions"><button type="button" class="btn" data-close>No</button><button type="button" class="btn danger" id="resetDataYesBtn">Yes</button></div></div></div>
 <div class="overlay" id="resetDataFinalConfirmModal"><div class="modal small"><div class="modalhead"><div><div class="eyebrow">Final confirmation</div><h2 style="margin:4px 0 0">This action cannot be reversed. Do you wish to proceed?</h2></div><button class="x" data-close>×</button></div><div class="modalactions"><button type="button" class="btn" data-close>No</button><button type="button" class="btn danger" id="resetDataFinalYesBtn">Yes</button></div></div></div>
 <div class="overlay" id="resetModal"><div class="modal small"><div class="modalhead"><div><div class="eyebrow">Reset calendar</div><h2 style="margin:4px 0 0">Clear all planning data?</h2></div><button class="x" data-close>×</button></div><p class="muted" style="line-height:1.6;margin:0">This will permanently remove all Blocks and Tasks from your calendar and reset all calendar progress. Your Notes, Folders, and Think boards will not be affected.</p><div class="modalactions"><button type="button" class="btn" data-close>Cancel</button><button type="button" class="btn danger" id="confirmResetCalendar">Reset calendar</button></div></div></div><div class="drag-selection-badge" id="dragSelectionBadge"></div><div class="toast" id="toast"></div>
+<div class="overlay" id="authModal"><div class="modal small"><div class="modalhead"><div><h2 id="authTitle" style="margin:4px 0 0">Sign in</h2></div><button class="x" data-close>×</button></div><div id="authSignedOut"><p class="auth-copy">Sync your plans securely across devices with Supabase.</p><br><form class="form" id="authForm"><div class="field"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div><div class="field"><label for="authPassword">Password</label><input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="At least 6 characters"></div><div class="auth-error" id="authError" role="alert"></div><div class="modalactions"><button class="btn primary" id="authSubmit">Sign In</button><button type="button" class="iconbtn today-top" id="authModeToggle">Create an account</button></div></form></div><div id="authSignedIn" style="display:none"><div class="account-email" id="accountEmail"></div><p class="account-note">Your plan data syncs automatically to your private account.</p><div class="modalactions"><button type="button" class="btn" id="signOutBtn">Sign Out</button><button type="button" class="btn auth-danger" id="deleteAccountBtn">Delete Account</button></div></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
 'use strict';
 const KEY='blockit-v2-data';
+const SUPABASE_URL = window.BLOCK_IT_SUPABASE_URL || 'https://huaoctalsirgrwnsahyj.supabase.co';
+const SUPABASE_ANON_KEY = window.BLOCK_IT_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YW9jdGFsc2lyZ3J3bnNhaHlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1ODQ0MjEsImV4cCI6MjEwNTE2MDQyMX0.lhlhzLwXyeOSiw2WMxORukal6qW_-VQwqFYMMddtXlg';
+const supabaseClient=window.supabase&&!SUPABASE_URL.includes('YOUR-PROJECT')&&!SUPABASE_ANON_KEY.includes('YOUR-ANON-KEY')?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+let currentUser=null;
+let saveTimer=null;
+let authMode='signin';
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const parseDate=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
@@ -142,7 +151,22 @@ const defaultData=()=>({blocks:[
 {id:'t2',title:'Review Block It homepage',date:iso(today),done:false}],folders:[{id:'f1',name:'Personal'},{id:'f2',name:'Work'}],notes:[{id:'n1',folderId:'f1',title:'Weekly priorities',body:'Protect time for the work that matters.\n\n1. Deep work\n2. Training\n3. Block It',updated:Date.now()}],boards:[{id:'br1',name:'Block It Ideas',description:'Ideas, positioning and content directions.',cards:[{id:'c1',title:'Content series',thoughts:'A recurring series explaining why foundations matter.',color:'yellow',items:[{id:'i1',text:'Founder stories'},{id:'i2',text:'Before / after positioning'}]},{id:'c2',title:'Website experiments',thoughts:'Try clearer proof and case-study framing.',color:'blue',items:[]}]}]});
 const emptyData=()=>({blocks:[],tasks:[],folders:[],notes:[],boards:[]});
 let data;try{data=JSON.parse(localStorage.getItem(KEY))||defaultData()}catch(e){data=defaultData()}
-const save=()=>localStorage.setItem(KEY,JSON.stringify(data));
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(data));
+  clearTimeout(saveTimer);
+  if(!currentUser||!supabaseClient)return;
+  saveTimer=setTimeout(async()=>{
+    const {error}=await supabaseClient.from('user_plans').upsert({user_id:currentUser.id,content:data,updated_at:new Date().toISOString()});
+    if(error)showToast('Cloud sync failed');
+  },700);
+}
+async function loadUserData(user){
+  if(!supabaseClient||!user)return;
+  const {data:row,error}=await supabaseClient.from('user_plans').select('content').eq('user_id',user.id).maybeSingle();
+  if(error){showToast('Could not load cloud data');return}
+  if(row?.content){data={...emptyData(),...row.content};localStorage.setItem(KEY,JSON.stringify(data))}
+  else save();
+}
 const MOBILE_WELCOME_KEY='blockit-mobile-welcome-seen';
 function maybeShowMobileWelcome(){
   if(window.innerWidth > 700) return;
@@ -200,6 +224,45 @@ const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
 function showToast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>el.classList.remove('show'),1800)}
 function open(id){$(id).classList.add('open')}function close(id){$(id).classList.remove('open')}
+function updateAuthUI(){
+  const signedIn=!!currentUser;
+  $('#profileBtn').textContent=signedIn?'●':'◯';
+  $('#profileBtn').title=signedIn?'Account':'Sign in';
+  $('#authSignedOut').style.display=signedIn?'none':'block';
+  $('#authSignedIn').style.display=signedIn?'block':'none';
+  $('#authTitle').textContent=signedIn?'Account':authMode==='signup'?'Create account':'Sign in';
+  if(signedIn)$('#accountEmail').textContent=currentUser.email||'Signed-in account';
+}
+function openAuth(){updateAuthUI();open('#authModal');if(!currentUser)setTimeout(()=>$('#authEmail')?.focus(),50)}
+async function handleAuthSubmit(e){
+  e.preventDefault();
+  if(!supabaseClient){$('#authError').textContent='Add your Supabase URL and anon key to enable accounts.';return}
+  const email=$('#authEmail').value.trim(),password=$('#authPassword').value;
+  $('#authError').textContent='';$('#authSubmit').disabled=true;
+  const result=authMode==='signup'?await supabaseClient.auth.signUp({email,password}):await supabaseClient.auth.signInWithPassword({email,password});
+  $('#authSubmit').disabled=false;
+  if(result.error){$('#authError').textContent=result.error.message;return}
+  if(authMode==='signup'&&!result.data.session){$('#authError').textContent='Check your email to confirm your account.';return}
+  close('#authModal');
+}
+async function deleteAccount(){
+  if(!currentUser||!supabaseClient)return;
+  if(!confirm('Delete your account and all synced plan data?'))return;
+  const {error:planError}=await supabaseClient.from('user_plans').delete().eq('user_id',currentUser.id);
+  if(planError){showToast('Could not delete synced data');return}
+  const {error}=await supabaseClient.rpc('delete_user');
+  if(error){showToast('Add the delete_user RPC to enable account deletion');return}
+  await supabaseClient.auth.signOut();
+}
+async function initializeAuth(){
+  updateAuthUI();
+  if(!supabaseClient)return;
+  supabaseClient.auth.onAuthStateChange((event,session)=>{setTimeout(async()=>{currentUser=session?.user||null;updateAuthUI();if(currentUser)await loadUserData(currentUser);render()},0)});
+  const {data:sessionData}=await supabaseClient.auth.getSession();
+  currentUser=sessionData.session?.user||null;
+  updateAuthUI();
+  if(currentUser)await loadUserData(currentUser);
+}
 function setView(v){state.view=v;state.boardId=null;$('#boardOverview').style.display=v==='think'?'block':'';$('#boardDetail').style.display='none';$$('.view').forEach(x=>x.classList.toggle('active',x.id==='view-'+v));$$('.nav,.mobile-nav button,#mobileMoreMenu button').forEach(x=>x.classList.toggle('active',x.dataset.view===v));$('#mobileMore').classList.toggle('active',['review','notes','think'].includes(v));const titles={home:['',''],plan:['',''],do:['',''],think:['',''],notes:['',''],review:['','']};$('#topTitle').textContent=titles[v][0];$('#topCrumb').textContent=titles[v][1];render();window.scrollTo({top:0,behavior:'smooth'})}
 function render(){renderHome();renderPlan();renderDo();renderNotes();renderBoards();upgradeBoardCards();renderReview()}
 document.addEventListener('click',e=>{if(e.target.closest('[data-board]'))setTimeout(upgradeBoardCards,0)});
@@ -385,6 +448,11 @@ $$('.overlay').forEach(x=>x.addEventListener('click',e=>{if(e.target===x)x.class
 $$('[data-capture]').forEach(x=>x.addEventListener('click',()=>{let t=x.dataset.capture;close('#capture');if(t==='block')openComposer();else if(t==='task')newTask();else if(t==='note')createNote();else if(t==='idea'){setView('think');setTimeout(()=>{if(!data.boards.length){askSimple('New board','Board name','board')}else{state.boardId=data.boards[0].id;renderBoards();setTimeout(()=>addCard(data.boards[0]),30)}},30)}}));
 function openPalette(){let actions=[['New Block','Create a time block',()=>openComposer(),'default'],['Go Home','Open dashboard',()=>setView('home'),'default'],['Open Plan','Open calendar',()=>setView('plan'),'default'],['Open Notes','Open notes',()=>setView('notes'),'default'],['Open Think','Open brainstorm boards',()=>setView('think'),'default'],['Open Review','Review your week',()=>setView('review'),'default'],['Add Task','Create an untimed task',()=>newTask(),'default'],['Reset Data','Delete all saved app data',()=>openResetDataFlow(),'danger']];$('#paletteList').innerHTML=actions.map((a,i)=>`<button class="palette-item ${a[3]==='danger'?'danger':''}" data-pal="${i}"><b>${a[0]}</b><span class="muted"> · ${a[1]}</span></button>`).join('');$$('[data-pal]').forEach(x=>x.onclick=()=>{actions[+x.dataset.pal][2]();close('#palette')});$('#paletteSearch').value='';open('#palette');setTimeout(()=>$('#paletteSearch').focus(),50)}
 $('#paletteSearch').addEventListener('input',e=>{let q=e.target.value.toLowerCase();$$('[data-pal]').forEach(x=>x.style.display=x.textContent.toLowerCase().includes(q)?'block':'none')});
+$('#profileBtn').addEventListener('click',openAuth);
+$('#authForm').addEventListener('submit',handleAuthSubmit);
+$('#authModeToggle').addEventListener('click',()=>{authMode=authMode==='signin'?'signup':'signin';$('#authSubmit').textContent=authMode==='signup'?'Sign Up':'Sign In';$('#authModeToggle').textContent=authMode==='signup'?'Already have an account? Sign in':'Create an account';$('#authTitle').textContent=authMode==='signup'?'Create account':'Sign in';$('#authError').textContent=''});
+$('#signOutBtn').addEventListener('click',async()=>{if(supabaseClient)await supabaseClient.auth.signOut();else{currentUser=null;updateAuthUI();close('#authModal')}});
+$('#deleteAccountBtn').addEventListener('click',deleteAccount);
 $('#resetDataYesBtn').addEventListener('click',()=>{close('#resetDataConfirmModal');open('#resetDataFinalConfirmModal')});
 $('#resetDataFinalYesBtn').addEventListener('click',resetAllAppData);
 $('#mobileWelcomeExploreBtn').addEventListener('click',()=>{localStorage.setItem(MOBILE_WELCOME_KEY,'1');close('#mobileWelcomeModal')});
@@ -398,6 +466,7 @@ $('#confirmResetCalendar').addEventListener('click',e=>{e.preventDefault();e.sto
 // delegated block/task handlers
 $('#app').addEventListener('click',e=>{let del=e.target.closest('[data-task-delete]');if(del){e.preventDefault();e.stopPropagation();deleteTask(del.dataset.taskDelete);return}let b=e.target.closest('[data-block]');if(b){e.preventDefault();e.stopPropagation();openBlock(b.dataset.block);return}let completion=e.target.closest('[data-complete-type][data-complete-id]');if(completion){e.preventDefault();e.stopPropagation();let item=completion.dataset.completeType==='block'?data.blocks.find(x=>x.id===completion.dataset.completeId):data.tasks.find(x=>x.id===completion.dataset.completeId);if(item){item.done=!item.done;save();render();showToast(item.done?'Marked complete':'Marked incomplete')}return}let calendarTask=e.target.closest('.week-task,.agenda-item[data-task],.day-task');if(calendarTask){e.preventDefault();e.stopPropagation();editTask(calendarTask.dataset.task);return}let t=e.target.closest('[data-task]');if(t){e.preventDefault();e.stopPropagation();toggleTask(t.dataset.task)}});
 render();
+initializeAuth();
 setTimeout(maybeShowMobileWelcome, 2000);
 })();
 </script>
