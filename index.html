@@ -163,6 +163,7 @@ body.auth-locked .auth-overlay{display:flex}
   </button>
   <div class="profile-menu" id="profileMenu">
     <div class="profile-email" id="profileEmail">Not signed in</div>
+    <button id="signInBtn">Sign in</button>
     <button id="signOutBtn">Sign out</button>
     <button class="danger" id="deleteAccountBtn">Delete account</button>
   </div>
@@ -310,11 +311,17 @@ function updateProfileUI(){
   const signedIn=!!currentUser;
   const email=currentUser?.email||'Not signed in';
   const label=signedIn?`Signed in as ${getDisplayName(currentUser)}`:'Log in';
+  const signInBtn=$('#signInBtn');
+  const signOutBtn=$('#signOutBtn');
+  const deleteAccountBtn=$('#deleteAccountBtn');
   $('#profileEmail').textContent=signedIn ? email : 'Not signed in';
   $('#profileBtn').classList.toggle('visible',true);
   $('#profileBtn').classList.toggle('logged-in',signedIn);
   $('#profileBtn').setAttribute('title',label);
   $('#profileBtn').setAttribute('aria-label',label);
+  if(signInBtn) signInBtn.style.display=signedIn ? 'none' : 'flex';
+  if(signOutBtn) signOutBtn.style.display=signedIn ? 'flex' : 'none';
+  if(deleteAccountBtn) deleteAccountBtn.style.display=signedIn ? 'flex' : 'none';
 }
 async function loadUserData(user){
   currentUser=user;
@@ -695,7 +702,19 @@ $('#resetDataFinalYesBtn').addEventListener('click',resetAllAppData);
 $('#authSignInTab').addEventListener('click',()=>setAuthMode('signin'));
 $('#authSignUpTab').addEventListener('click',()=>setAuthMode('signup'));
 $('#authForm').addEventListener('submit',e=>{e.preventDefault();authMode==='signin'?signIn():signUp()});
-$('#profileBtn').addEventListener('click',e=>{e.stopPropagation();$('#profileMenu').classList.toggle('open')});
+$('#profileBtn').addEventListener('click',e=>{
+  e.stopPropagation();
+  if(!currentUser){
+    $('#profileMenu').classList.remove('open');
+    showAuth('Log in to use this app across devices.');
+    return;
+  }
+  $('#profileMenu').classList.toggle('open');
+});
+$('#signInBtn').addEventListener('click',()=>{
+  $('#profileMenu').classList.remove('open');
+  showAuth('Log in to use this app across devices.');
+});
 $('#signOutBtn').addEventListener('click',signOut);
 $('#deleteAccountBtn').addEventListener('click',deleteAccount);
 document.addEventListener('click',e=>{if(!e.target.closest('.profile-wrap'))$('#profileMenu')?.classList.remove('open')});
