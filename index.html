@@ -121,7 +121,7 @@
 
 <style>
 .auth-required{display:none}
-body.auth-locked .app{filter:blur(4px);pointer-events:none;user-select:none}
+body.auth-locked .app{filter:blur(4px);user-select:none}
 body.auth-locked .auth-overlay{display:flex}
 .auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
 .auth-card{width:min(430px,100%);background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:0 25px 70px #0005;padding:24px}
@@ -143,10 +143,11 @@ body.auth-locked .auth-overlay{display:flex}
 @media(max-width:700px){
   .auth-overlay{align-items:flex-end;padding:0}
   .auth-card{width:100%;border-radius:18px 18px 0 0;padding:20px;max-height:92vh}
-  .profile-btn{width:42px;padding:0}
+  .profile-btn{width:42px;padding:0;display:inline-flex!important}
+  .profile-btn.visible{display:inline-flex!important}
   .profile-menu{position:fixed;right:12px;top:67px;width:calc(100vw - 24px);max-width:300px}
   .sync-status{display:none!important}
-  .blockbtn{position:fixed;right:18px;bottom:90px;z-index:40;width:60px;height:60px;border-radius:18px;box-shadow:0 18px 34px rgba(255,184,28,.35);border:1px solid rgba(17,17,17,.06)}
+  .blockbtn{position:fixed;right:18px;bottom:90px;z-index:40;width:60px;height:60px;border-radius:18px;box-shadow:0 18px 34px rgba(255,184,28,.35);border:1px solid rgba(17,17,17,.06);display:grid!important}
   .blockbtn:after{content:'+';font-size:28px;line-height:1}
 }
 </style>
@@ -429,7 +430,8 @@ async function initAuth(){
     currentUser=null;
     authReady=true;
     data=readCachedData()||defaultData();
-    hideAuth();
+    updateProfileUI();
+    showAuth('Log in to use this app across devices.');
     setSyncStatus('Local',true,false);
     render();
     return;
