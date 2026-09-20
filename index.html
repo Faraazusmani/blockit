@@ -99,13 +99,75 @@
   .month-grid .month-task,.month-grid .month-item{font-size:7.5px!important;line-height:1.2}
 }
 .idea-card .rich-content{line-clamp:4}
-.profile-btn{width:40px;padding:0;font-size:18px}.auth-status{font-size:11px;color:var(--muted);margin-top:4px}.auth-copy{margin:0;color:var(--muted);font-size:13px;line-height:1.5}.auth-error{color:var(--red);font-size:12px;min-height:16px}.account-email{font-size:14px;font-weight:700;overflow-wrap:anywhere}.account-note{font-size:12px;color:var(--muted);line-height:1.5}.auth-switch{color:var(--blue);font-size:12px;font-weight:700}.auth-danger{color:var(--red);border-color:#f0c9c5;background:#fff7f6}
+
+/* Header polish */
+.profile-btn{display:none;width:38px;height:38px;min-width:38px;padding:0;border-radius:11px;background:var(--panel);border:1px solid var(--line);align-items:center;justify-content:center}
+.profile-btn.visible{display:inline-flex}
+.profile-icon{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.top-title{font-size:24px}
+@media(max-width:700px){
+  .top-title{font-size:21px}
+  .top-title:after{content:none!important}
+  .top-actions{gap:6px}
+  .top-actions .iconbtn,#profileBtn,.blockbtn{width:36px;height:36px;min-width:36px;padding:0;margin-left:0;border-radius:10px}
+  .top-actions .iconbtn{font-size:18px;line-height:1}
+  #profileBtn{display:none}
+  #profileBtn.visible{display:inline-flex}
+  .blockbtn{font-size:0;display:grid;place-items:center}
+  .blockbtn:after{content:'+';font-size:21px;line-height:1}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+.auth-required{display:none}
+body.auth-locked .app{filter:blur(4px);pointer-events:none;user-select:none}
+body.auth-locked .auth-overlay{display:flex}
+.auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,.58);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
+.auth-card{width:min(430px,100%);background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:0 25px 70px #0005;padding:24px}
+.auth-brand{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.auth-brandmark{width:34px;height:34px;border-radius:10px;background:var(--yellow);display:grid;place-items:center;font-weight:900}
+.auth-card h2{margin:0;font-size:23px;letter-spacing:-.04em}
+.auth-sub{margin:7px 0 20px;color:var(--muted);font-size:13px;line-height:1.5}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;padding:4px;background:var(--panel2);border-radius:11px;margin-bottom:18px}
+.auth-tabs button{padding:9px;border-radius:8px;color:var(--muted);font-size:12px;font-weight:750}
+.auth-tabs button.active{background:var(--panel);color:var(--text);box-shadow:0 1px 5px #00000012}
+.auth-form{display:grid;gap:13px}
+.auth-field label{display:block;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:7px}
+.auth-field input{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;background:#fafafd;color:var(--text)}
+.auth-submit{height:42px;border-radius:11px;background:var(--yellow);color:#111;font-weight:800;margin-top:4px}
+.auth-message{min-height:18px;color:var(--muted);font-size:11px;line-height:1.45;margin-top:5px}
+.auth-message.error{color:var(--red)}
+.profile-wrap{position:relative}
+.profile-btn{position:relative;display:none;height:40px;width:40px;min-width:40px;padding:0;border-radius:12px;background:var(--panel);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:750;font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,.04);transition:transform .15s ease,border-color .15s ease,background .15s ease}.profile-btn:hover{transform:translateY(-1px)}.profile-btn.visible{display:inline-flex}.profile-btn.logged-in{background:var(--greenSoft);border-color:#cfead6}.profile-btn.logged-in .profile-icon{stroke:var(--green)}.profile-btn .profile-status-dot{position:absolute;right:2px;bottom:2px;width:9px;height:9px;border-radius:50%;background:var(--green);border:2px solid var(--panel);display:none}.profile-btn.logged-in .profile-status-dot{display:block}.profile-icon{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.profile-menu{position:absolute;right:0;top:48px;width:245px;background:var(--panel);border:1px solid var(--line);border-radius:15px;box-shadow:0 16px 40px #0002;padding:7px;display:none;z-index:60}.profile-menu.open{display:block}.profile-email{padding:10px 11px 11px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.profile-menu button{display:flex;width:100%;align-items:center;padding:10px 11px;border-radius:9px;text-align:left;font-size:12px;font-weight:700}.profile-menu button:hover{background:var(--panel2)}.profile-menu .danger{color:var(--red)}.sync-status{font-size:10px;color:var(--muted);display:none;align-items:center;gap:5px}.sync-status.show{display:inline-flex}.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+@media(max-width:700px){
+  .auth-overlay{align-items:flex-end;padding:0}
+  .auth-card{width:100%;border-radius:18px 18px 0 0;padding:20px;max-height:92vh}
+  .profile-btn{width:42px;padding:0}
+  .profile-menu{position:fixed;right:12px;top:67px;width:calc(100vw - 24px);max-width:300px}
+  .sync-status{display:none!important}
+  .blockbtn{position:fixed;right:18px;bottom:90px;z-index:40;width:60px;height:60px;border-radius:18px;box-shadow:0 18px 34px rgba(255,184,28,.35);border:1px solid rgba(17,17,17,.06)}
+  .blockbtn:after{content:'+';font-size:28px;line-height:1}
+}
 </style>
 </head>
 <body>
 <div class="app" id="app">
 <aside class="sidebar"><div class="brand"><div class="brandmark">B</div><strong>Block It</strong></div><div class="navgroup"><div class="navlabel">Workspace</div><button class="nav active" data-view="home"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg></span>Home</button><button class="nav" data-view="plan"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M8 14h2M14 14h2M8 18h2"/></svg></span>Plan</button><button class="nav" data-view="do"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="m7.5 12 3 3 6-6"/></svg></span>Do</button><button class="nav" data-view="review"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h17"/><path d="M7 16v-4M11 16V8M15 16V5M19 16v-7"/></svg></span>Review</button></div><div class="navgroup"><div class="navlabel">Library</div><button class="nav" data-view="notes"><span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12a2 2 0 0 1 2 2v14l-4 2-4-2-4 2-4-2V5a2 2 0 0 1 2-2Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span>Notes</button><button class="nav" data-view="think"><span class="ico">✦</span>Think</button></div><div class="sidebar-bottom"><button class="capture-mini" id="captureBtn">＋ Quick Capture</button><div class="shortcut">Ctrl/Cmd + K · Command palette</div></div></aside>
-<main class="main"><header class="topbar"><div class="top-left"><div class="top-title" id="topTitle"></div><div class="crumb" id="topCrumb"></div></div><div class="top-actions"><button class="iconbtn" id="searchBtn" title="Command palette">⌘</button><button class="iconbtn today-top" id="todayBtn">Today</button><button class="iconbtn" id="focusIndicator" style="display:none">00:00</button><button class="blockbtn" id="blockBtn">Block</button><button class="iconbtn profile-btn" id="profileBtn" title="Account">◯</button></div></header>
+<main class="main"><header class="topbar"><div class="top-left"><div class="top-title" id="topTitle"></div><div class="crumb" id="topCrumb"></div></div><div class="top-actions"><button class="iconbtn" id="searchBtn" title="Command palette">⌘</button><button class="iconbtn today-top" id="todayBtn">Today</button><button class="iconbtn" id="focusIndicator" style="display:none">00:00</button>
+<span class="sync-status" id="syncStatus"><span class="sync-dot"></span><span id="syncStatusText">Synced</span></span>
+<div class="profile-wrap">
+  <button class="profile-btn" id="profileBtn" title="Log in" aria-label="Log in">
+    <svg class="profile-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.25"></circle><path d="M5.5 20c.7-3.55 3.05-5.25 6.5-5.25s5.8 1.7 6.5 5.25"></path></svg>
+    <span class="profile-status-dot" aria-hidden="true"></span>
+  </button>
+  <div class="profile-menu" id="profileMenu">
+    <div class="profile-email" id="profileEmail">Not signed in</div>
+    <button id="signOutBtn">Sign out</button>
+    <button class="danger" id="deleteAccountBtn">Delete account</button>
+  </div>
+</div>
+<button class="blockbtn" id="blockBtn">Block</button></div></header>
 <section class="content">
 <div class="view active" id="view-home"><div class="eyebrow" id="homeDate"></div><div class="h1">Welcome</div><div class="sub">Turn what matters into time you can actually use.</div><div class="section home-grid"><div class="hero"><div class="eyebrow">Today</div><div id="homeTimeline"></div></div><div><div class="sectionhead"><h2>Needs attention</h2><span class="link" id="attentionCount"></span></div><div class="attention" id="attention"></div><div class="section"><div class="sectionhead"><h2>This week</h2><span class="link">Consistency</span></div><div class="stats" id="homeStats"></div></div></div></div><div class="section"><div class="sectionhead"><h2>Upcoming</h2><button class="link" data-go="plan">See calendar</button></div><div class="stats" id="upcoming"></div></div></div>
 <div class="view" id="view-plan"><div class="eyebrow">Plan</div><div class="calendar-title" id="calendarTitle"></div><div class="calendar-toolbar"><div class="calendar-left"><div class="navarrows"><button class="arrow" id="prevPeriod">‹</button><button class="arrow" id="nextPeriod">›</button></div><button class="today" id="calendarToday">Today</button><button class="today reset-calendar" id="resetCalendarBtn">Reset calendar</button></div><div class="seg" id="calendarSeg"><button data-cal="day">Day</button><button class="active" data-cal="week">Week</button><button data-cal="month">Month</button><button data-cal="year">Year</button></div></div><div id="calendarArea"></div></div>
@@ -116,6 +178,21 @@
 </section></main></div>
 <div class="mobile-more-menu" id="mobileMoreMenu" aria-hidden="true"><button data-view="review" title="Review"><span class="mobile-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 3-4 3 2 5-7"/></svg></span></button><button data-view="notes" title="Notes"><span class="mobile-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12a2 2 0 0 1 2 2v14l-4 2-4-2-4 2-4-2V5a2 2 0 0 1 2-2Z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span></button><button data-view="think" title="Think"><span class="mobile-ico think-symbol">✦</span></button></div><nav class="mobile-nav"><button data-view="home" title="Home"><span class="mobile-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg></span></button><button data-view="plan" title="Plan"><span class="mobile-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M8 14h2M14 14h2M8 18h2"/></svg></span></button><button data-view="do" title="Do"><span class="mobile-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="m7.5 12 3 3 6-6"/></svg></span></button><button id="mobileMore" title="More"><span class="mobile-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></span></button></nav>
 
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card">
+    <div class="auth-brand"><div class="auth-brandmark">B</div><div><h2>Welcome to Block It</h2><div class="auth-sub" id="authSubtitle" style="margin:3px 0 0">Log in to use this app across devices.</div></div></div>
+    <div class="auth-tabs">
+      <button type="button" id="authSignInTab" class="active">Sign In</button>
+      <button type="button" id="authSignUpTab">Sign Up</button>
+    </div>
+    <form class="auth-form" id="authForm">
+      <div class="auth-field"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+      <div class="auth-field"><label for="authPassword">Password</label><input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="At least 6 characters"></div>
+      <button class="auth-submit" id="authSubmit" type="submit">Sign In</button>
+      <div class="auth-message" id="authMessage" role="status"></div>
+    </form>
+  </div>
+</div>
 <div class="overlay" id="composer"><div class="modal"><div class="modalhead"><h2 id="composerTitle">New Block</h2><button class="x" data-close>×</button></div><form class="form" id="blockForm"><div class="field"><label>Title</label><input id="fTitle" required placeholder="What are you blocking time for?"/></div><div class="twocol"><div class="field"><label>Date</label><input id="fDate" type="date" required/></div><div class="field"><label>Color</label><select id="fColor"><option value="blue">Blue</option><option value="yellow">Yellow</option><option value="green">Green</option></select></div></div><div class="twocol"><div class="field"><label>Start</label><input id="fStart" type="time" required/></div><div class="field"><label>End</label><input id="fEnd" type="time" required/></div></div><div class="field"><label>Notes</label><textarea id="fNotes" placeholder="Optional context..."></textarea></div><div id="blockSchedule" class="schedule-box" style="display:none"><div class="schedule-title">Schedule this block</div><div class="schedule-options"><label class="schedule-option"><input type="radio" name="blockScheduleMode" value="single" checked> One day</label><label class="schedule-option"><input type="radio" name="blockScheduleMode" value="range"> Date range</label><label class="schedule-option"><input type="radio" name="blockScheduleMode" value="manual"> Select days</label></div><div id="blockSchedulePanel" class="schedule-panel"></div></div><div class="field"><label>Status</label><label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);font-weight:600"><input id="fDone" type="checkbox" style="width:18px;height:18px;accent-color:var(--green)"> Mark as completed</label></div><div class="modalactions"><button type="button" class="btn" data-close>Cancel</button><button class="btn yellow">Save Block</button></div></form></div></div>
 <div class="overlay" id="capture"><div class="modal small"><div class="modalhead"><h2>Quick Capture</h2><button class="x" data-close>×</button></div><div class="capture-options"><button class="capture-option" data-capture="block"><strong>＋ Block</strong><span>Reserve time intentionally.</span></button><button class="capture-option" data-capture="task"><strong>✓ Task</strong><span>Add a task without time.</span></button><button class="capture-option" data-capture="note"><strong>▤ Note</strong><span>Capture something worth keeping.</span></button><button class="capture-option" data-capture="idea"><strong>✦ Idea</strong><span>Add an idea to a board.</span></button></div></div></div>
 <div class="overlay" id="simpleModal"><div class="modal small"><div class="modalhead"><h2 id="simpleTitle"></h2><button class="x" data-close>×</button></div><form class="form" id="simpleForm"><div class="field"><label id="simpleLabel">Name</label><input id="simpleInput" required/></div><div class="modalactions"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary">Create</button></div></form></div></div>
@@ -126,18 +203,19 @@
 <div class="overlay" id="resetDataConfirmModal"><div class="modal small"><div class="modalhead"><div><div class="eyebrow">Reset data</div><h2 style="margin:4px 0 0">Do you wish to delete all the data?</h2></div><button class="x" data-close>×</button></div><div class="modalactions"><button type="button" class="btn" data-close>No</button><button type="button" class="btn danger" id="resetDataYesBtn">Yes</button></div></div></div>
 <div class="overlay" id="resetDataFinalConfirmModal"><div class="modal small"><div class="modalhead"><div><div class="eyebrow">Final confirmation</div><h2 style="margin:4px 0 0">This action cannot be reversed. Do you wish to proceed?</h2></div><button class="x" data-close>×</button></div><div class="modalactions"><button type="button" class="btn" data-close>No</button><button type="button" class="btn danger" id="resetDataFinalYesBtn">Yes</button></div></div></div>
 <div class="overlay" id="resetModal"><div class="modal small"><div class="modalhead"><div><div class="eyebrow">Reset calendar</div><h2 style="margin:4px 0 0">Clear all planning data?</h2></div><button class="x" data-close>×</button></div><p class="muted" style="line-height:1.6;margin:0">This will permanently remove all Blocks and Tasks from your calendar and reset all calendar progress. Your Notes, Folders, and Think boards will not be affected.</p><div class="modalactions"><button type="button" class="btn" data-close>Cancel</button><button type="button" class="btn danger" id="confirmResetCalendar">Reset calendar</button></div></div></div><div class="drag-selection-badge" id="dragSelectionBadge"></div><div class="toast" id="toast"></div>
-<div class="overlay" id="authModal"><div class="modal small"><div class="modalhead"><div><h2 id="authTitle" style="margin:4px 0 0">Sign in</h2></div><button class="x" data-close>×</button></div><div id="authSignedOut"><p class="auth-copy">Sync your plans securely across devices with Supabase.</p><br><form class="form" id="authForm"><div class="field"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div><div class="field"><label for="authPassword">Password</label><input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="At least 6 characters"></div><div class="auth-error" id="authError" role="alert"></div><div class="modalactions"><button class="btn primary" id="authSubmit">Sign In</button><button type="button" class="iconbtn today-top" id="authModeToggle">Create an account</button></div></form></div><div id="authSignedIn" style="display:none"><div class="account-email" id="accountEmail"></div><p class="account-note">Your plan data syncs automatically to your private account.</p><div class="modalactions"><button type="button" class="btn" id="signOutBtn">Sign Out</button><button type="button" class="btn auth-danger" id="deleteAccountBtn">Delete Account</button></div></div></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
 'use strict';
+const SUPABASE_URL='YOUR_SUPABASE_URL';
+const SUPABASE_PUBLISHABLE_KEY='YOUR_SUPABASE_PUBLISHABLE_KEY';
+const SUPABASE_CONFIGURED=SUPABASE_URL.startsWith('https://')&&!SUPABASE_URL.includes('YOUR_')&&!!SUPABASE_PUBLISHABLE_KEY&&!SUPABASE_PUBLISHABLE_KEY.includes('YOUR_')&&!!window.supabase;
+const supabase=SUPABASE_CONFIGURED?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
 const KEY='blockit-v2-data';
-const SUPABASE_URL = window.BLOCK_IT_SUPABASE_URL || 'https://huaoctalsirgrwnsahyj.supabase.co';
-const SUPABASE_ANON_KEY = window.BLOCK_IT_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1YW9jdGFsc2lyZ3J3bnNhaHlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1ODQ0MjEsImV4cCI6MjEwNTE2MDQyMX0.lhlhzLwXyeOSiw2WMxORukal6qW_-VQwqFYMMddtXlg';
-const supabaseClient=window.supabase&&!SUPABASE_URL.includes('YOUR-PROJECT')&&!SUPABASE_ANON_KEY.includes('YOUR-ANON-KEY')?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
 let currentUser=null;
+let authReady=false;
 let saveTimer=null;
-let authMode='signin';
+let saveInFlight=false;
+let saveQueued=false;
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const parseDate=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
@@ -150,24 +228,227 @@ const defaultData=()=>({blocks:[
 {id:'t1',title:'Finish API optimization',date:iso(today),done:false},
 {id:'t2',title:'Review Block It homepage',date:iso(today),done:false}],folders:[{id:'f1',name:'Personal'},{id:'f2',name:'Work'}],notes:[{id:'n1',folderId:'f1',title:'Weekly priorities',body:'Protect time for the work that matters.\n\n1. Deep work\n2. Training\n3. Block It',updated:Date.now()}],boards:[{id:'br1',name:'Block It Ideas',description:'Ideas, positioning and content directions.',cards:[{id:'c1',title:'Content series',thoughts:'A recurring series explaining why foundations matter.',color:'yellow',items:[{id:'i1',text:'Founder stories'},{id:'i2',text:'Before / after positioning'}]},{id:'c2',title:'Website experiments',thoughts:'Try clearer proof and case-study framing.',color:'blue',items:[]}]}]});
 const emptyData=()=>({blocks:[],tasks:[],folders:[],notes:[],boards:[]});
-let data;try{data=JSON.parse(localStorage.getItem(KEY))||defaultData()}catch(e){data=defaultData()}
-function save(){
-  localStorage.setItem(KEY,JSON.stringify(data));
-  clearTimeout(saveTimer);
-  if(!currentUser||!supabaseClient)return;
-  saveTimer=setTimeout(async()=>{
-    const {error}=await supabaseClient.from('user_plans').upsert({user_id:currentUser.id,content:data,updated_at:new Date().toISOString()});
-    if(error)showToast('Cloud sync failed');
-  },700);
+let data=emptyData();
+const cacheKey=()=>currentUser?`${KEY}:${currentUser.id}`:null;
+function setSyncStatus(text,show=true,error=false){
+  const el=$('#syncStatus'),label=$('#syncStatusText');
+  if(!el)return;
+  el.classList.toggle('show',show);
+  if(label)label.textContent=text;
+  const dot=el.querySelector('.sync-dot');
+  if(dot)dot.style.background=error?'var(--red)':'var(--green)';
 }
-async function loadUserData(user){
-  if(!supabaseClient||!user)return;
-  const {data:row,error}=await supabaseClient.from('user_plans').select('content').eq('user_id',user.id).maybeSingle();
-  if(error){showToast('Could not load cloud data');return}
-  if(row?.content){data={...emptyData(),...row.content};localStorage.setItem(KEY,JSON.stringify(data))}
-  else save();
+function cacheData(){
+  const key=cacheKey();
+  if(!key)return;
+  try{localStorage.setItem(key,JSON.stringify(data))}catch(e){}
+}
+function readCachedData(){
+  const key=cacheKey();
+  if(!key)return null;
+  try{return JSON.parse(localStorage.getItem(key))}catch(e){return null}
+}
+function save(){
+  cacheData();
+  if(!currentUser||!authReady)return;
+  saveQueued=true;
+  setSyncStatus('Saving…',true,false);
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(flushSave,750);
+}
+async function flushSave(){
+  if(!currentUser||!authReady||!saveQueued)return;
+  if(saveInFlight){return}
+  saveQueued=false; saveInFlight=true;
+  try{
+    const {error}=await supabase.from('user_plans').upsert(
+      {user_id:currentUser.id,content:data,updated_at:new Date().toISOString()},
+      {onConflict:'user_id'}
+    );
+    if(error)throw error;
+    setSyncStatus('Synced',true,false);
+  }catch(error){
+    console.error('Block It sync error:',error);
+    saveQueued=true;
+    setSyncStatus('Sync failed',true,true);
+  }finally{
+    saveInFlight=false;
+    if(saveQueued){clearTimeout(saveTimer);saveTimer=setTimeout(flushSave,750)}
+  }
 }
 const MOBILE_WELCOME_KEY='blockit-mobile-welcome-seen';
+
+let authMode='signin';
+function setAuthMode(mode){
+  authMode=mode;
+  $('#authSignInTab').classList.toggle('active',mode==='signin');
+  $('#authSignUpTab').classList.toggle('active',mode==='signup');
+  $('#authSubmit').textContent=mode==='signin'?'Sign In':'Sign Up';
+  $('#authPassword').autocomplete=mode==='signin'?'current-password':'new-password';
+  $('#authMessage').textContent='';
+  $('#authMessage').className='auth-message';
+}
+function getDisplayName(user){
+  const email=(user?.email||'').trim();
+  if(!email) return 'there';
+  const username=email.split('@')[0].replace(/[._-]+/g,' ').trim();
+  return username ? username.split(' ').map(part=>part.charAt(0).toUpperCase()+part.slice(1)).join(' ') : 'there';
+}
+function showAuth(message=''){
+  const subtitle=$('#authSubtitle');
+  if(subtitle) subtitle.textContent='Log in to use this app across devices.';
+  document.body.classList.add('auth-locked');
+  $('#authOverlay').style.display='flex';
+  $('#authMessage').textContent=message;
+}
+function hideAuth(){
+  document.body.classList.remove('auth-locked');
+  $('#authOverlay').style.display='none';
+  $('#authMessage').textContent='';
+}
+function updateProfileUI(){
+  const signedIn=!!currentUser;
+  const email=currentUser?.email||'Not signed in';
+  const label=signedIn?`Signed in as ${getDisplayName(currentUser)}`:'Log in';
+  $('#profileEmail').textContent=signedIn ? email : 'Not signed in';
+  $('#profileBtn').classList.toggle('visible',true);
+  $('#profileBtn').classList.toggle('logged-in',signedIn);
+  $('#profileBtn').setAttribute('title',label);
+  $('#profileBtn').setAttribute('aria-label',label);
+}
+async function loadUserData(user){
+  currentUser=user;
+  authReady=false;
+  updateProfileUI();
+  showAuth('Loading your plan…');
+  setSyncStatus('Loading…',true,false);
+  try{
+    const {data:row,error}=await supabase.from('user_plans').select('content,updated_at').eq('user_id',user.id).maybeSingle();
+    if(error)throw error;
+    if(row?.content){
+      data=row.content;
+      cacheData();
+    }else{
+      data=readCachedData()||defaultData();
+      await supabase.from('user_plans').upsert(
+        {user_id:user.id,content:data,updated_at:new Date().toISOString()},
+        {onConflict:'user_id'}
+      );
+      cacheData();
+    }
+    authReady=true;
+    hideAuth();
+    setSyncStatus('Synced',true,false);
+    showToast(`Welcome, ${getDisplayName(user)}`);
+    render();
+  }catch(error){
+    console.error('Block It load error:',error);
+    data=readCachedData()||defaultData();
+    authReady=true;
+    hideAuth();
+    setSyncStatus('Offline',true,true);
+    render();
+    showToast('Could not load cloud data. Local cache loaded.');
+  }
+}
+function clearUserData(){
+  currentUser=null;
+  authReady=false;
+  data=emptyData();
+  clearTimeout(saveTimer);
+  saveTimer=null;
+  saveQueued=false;
+  updateProfileUI();
+  setSyncStatus('',false,false);
+  showAuth('Log in to use this app across devices.');
+  render();
+}
+async function signIn(){
+  if(!SUPABASE_CONFIGURED){showToast('Connect Supabase to use account sign-in.');return}
+  const email=$('#authEmail').value.trim(),password=$('#authPassword').value;
+  if(!email||!password)return;
+  $('#authMessage').textContent='Signing in…';
+  $('#authMessage').className='auth-message';
+  const {error}=await supabase.auth.signInWithPassword({email,password});
+  if(error){
+    $('#authMessage').textContent=error.message;
+    $('#authMessage').className='auth-message error';
+  }
+}
+async function signUp(){
+  if(!SUPABASE_CONFIGURED){showToast('Connect Supabase to create an account.');return}
+  const email=$('#authEmail').value.trim(),password=$('#authPassword').value;
+  if(!email||!password)return;
+  $('#authMessage').textContent='Creating your account…';
+  $('#authMessage').className='auth-message';
+  const {data:result,error}=await supabase.auth.signUp({email,password});
+  if(error){
+    $('#authMessage').textContent=error.message;
+    $('#authMessage').className='auth-message error';
+    return;
+  }
+  if(result.session){
+    $('#authMessage').textContent='Account created. Loading your plan…';
+  }else{
+    $('#authMessage').textContent='Account created. Check your email to confirm your address, then sign in.';
+  }
+}
+async function signOut(){
+  if(!SUPABASE_CONFIGURED)return;
+  $('#profileMenu').classList.remove('open');
+  await flushSave();
+  const {error}=await supabase.auth.signOut();
+  if(error)showToast(error.message);
+}
+async function deleteAccount(){
+  if(!SUPABASE_CONFIGURED||!currentUser)return;
+  const ok=confirm('Delete your Block It account and all synced plan data? This cannot be undone.');
+  if(!ok)return;
+  $('#profileMenu').classList.remove('open');
+  setSyncStatus('Deleting…',true,false);
+  const {error}=await supabase.rpc('delete_my_account');
+  if(error){
+    console.error(error);
+    setSyncStatus('Delete failed',true,true);
+    showToast('Account deletion is not configured yet. Run the supplied SQL setup.');
+    return;
+  }
+  const oldKey=cacheKey();
+  if(oldKey)try{localStorage.removeItem(oldKey)}catch(e){}
+  await supabase.auth.signOut();
+}
+async function initAuth(){
+  if(!SUPABASE_CONFIGURED){
+    currentUser=null;
+    authReady=true;
+    data=readCachedData()||defaultData();
+    hideAuth();
+    setSyncStatus('Local',true,false);
+    render();
+    return;
+  }
+  supabase.auth.onAuthStateChange((event,session)=>{
+    if(event==='INITIAL_SESSION')return;
+    if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){
+      if(session?.user)loadUserData(session.user);
+    }else if(event==='SIGNED_OUT'){
+      clearUserData();
+    }
+  });
+  const {data:{session},error}=await supabase.auth.getSession();
+  if(error){
+    console.error(error);
+    clearUserData();
+    return;
+  }
+  if(session?.user){
+    await loadUserData(session.user);
+  }else{
+    clearUserData();
+    showToast('Please log in to use this app across devices.');
+  }
+}
+
 function maybeShowMobileWelcome(){
   if(window.innerWidth > 700) return;
   if(localStorage.getItem(MOBILE_WELCOME_KEY)==='1') return;
@@ -224,46 +505,7 @@ const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
 function showToast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>el.classList.remove('show'),1800)}
 function open(id){$(id).classList.add('open')}function close(id){$(id).classList.remove('open')}
-function updateAuthUI(){
-  const signedIn=!!currentUser;
-  $('#profileBtn').textContent=signedIn?'●':'◯';
-  $('#profileBtn').title=signedIn?'Account':'Sign in';
-  $('#authSignedOut').style.display=signedIn?'none':'block';
-  $('#authSignedIn').style.display=signedIn?'block':'none';
-  $('#authTitle').textContent=signedIn?'Account':authMode==='signup'?'Create account':'Sign in';
-  if(signedIn)$('#accountEmail').textContent=currentUser.email||'Signed-in account';
-}
-function openAuth(){updateAuthUI();open('#authModal');if(!currentUser)setTimeout(()=>$('#authEmail')?.focus(),50)}
-async function handleAuthSubmit(e){
-  e.preventDefault();
-  if(!supabaseClient){$('#authError').textContent='Add your Supabase URL and anon key to enable accounts.';return}
-  const email=$('#authEmail').value.trim(),password=$('#authPassword').value;
-  $('#authError').textContent='';$('#authSubmit').disabled=true;
-  const result=authMode==='signup'?await supabaseClient.auth.signUp({email,password}):await supabaseClient.auth.signInWithPassword({email,password});
-  $('#authSubmit').disabled=false;
-  if(result.error){$('#authError').textContent=result.error.message;return}
-  if(authMode==='signup'&&!result.data.session){$('#authError').textContent='Check your email to confirm your account.';return}
-  close('#authModal');
-}
-async function deleteAccount(){
-  if(!currentUser||!supabaseClient)return;
-  if(!confirm('Delete your account and all synced plan data?'))return;
-  const {error:planError}=await supabaseClient.from('user_plans').delete().eq('user_id',currentUser.id);
-  if(planError){showToast('Could not delete synced data');return}
-  const {error}=await supabaseClient.rpc('delete_user');
-  if(error){showToast('Add the delete_user RPC to enable account deletion');return}
-  await supabaseClient.auth.signOut();
-}
-async function initializeAuth(){
-  updateAuthUI();
-  if(!supabaseClient)return;
-  supabaseClient.auth.onAuthStateChange((event,session)=>{setTimeout(async()=>{currentUser=session?.user||null;updateAuthUI();if(currentUser)await loadUserData(currentUser);render()},0)});
-  const {data:sessionData}=await supabaseClient.auth.getSession();
-  currentUser=sessionData.session?.user||null;
-  updateAuthUI();
-  if(currentUser)await loadUserData(currentUser);
-}
-function setView(v){state.view=v;state.boardId=null;$('#boardOverview').style.display=v==='think'?'block':'';$('#boardDetail').style.display='none';$$('.view').forEach(x=>x.classList.toggle('active',x.id==='view-'+v));$$('.nav,.mobile-nav button,#mobileMoreMenu button').forEach(x=>x.classList.toggle('active',x.dataset.view===v));$('#mobileMore').classList.toggle('active',['review','notes','think'].includes(v));const titles={home:['',''],plan:['',''],do:['',''],think:['',''],notes:['',''],review:['','']};$('#topTitle').textContent=titles[v][0];$('#topCrumb').textContent=titles[v][1];render();window.scrollTo({top:0,behavior:'smooth'})}
+function setView(v){state.view=v;state.boardId=null;$('#boardOverview').style.display=v==='think'?'block':'';$('#boardDetail').style.display='none';$$('.view').forEach(x=>x.classList.toggle('active',x.id==='view-'+v));$$('.nav,.mobile-nav button,#mobileMoreMenu button').forEach(x=>x.classList.toggle('active',x.dataset.view===v));$('#mobileMore').classList.toggle('active',['review','notes','think'].includes(v));const titles={home:['Block It',''],plan:['Block It',''],do:['Block It',''],think:['Block It',''],notes:['Block It',''],review:['Block It','']};$('#topTitle').textContent=titles[v][0];$('#topCrumb').textContent=titles[v][1];render();window.scrollTo({top:0,behavior:'smooth'})}
 function render(){renderHome();renderPlan();renderDo();renderNotes();renderBoards();upgradeBoardCards();renderReview()}
 document.addEventListener('click',e=>{if(e.target.closest('[data-board]'))setTimeout(upgradeBoardCards,0)});
 document.addEventListener('submit',e=>{if(e.target.id==='itemForm'&&$('#cardTitle'))setTimeout(upgradeBoardCards,0)});
@@ -448,25 +690,26 @@ $$('.overlay').forEach(x=>x.addEventListener('click',e=>{if(e.target===x)x.class
 $$('[data-capture]').forEach(x=>x.addEventListener('click',()=>{let t=x.dataset.capture;close('#capture');if(t==='block')openComposer();else if(t==='task')newTask();else if(t==='note')createNote();else if(t==='idea'){setView('think');setTimeout(()=>{if(!data.boards.length){askSimple('New board','Board name','board')}else{state.boardId=data.boards[0].id;renderBoards();setTimeout(()=>addCard(data.boards[0]),30)}},30)}}));
 function openPalette(){let actions=[['New Block','Create a time block',()=>openComposer(),'default'],['Go Home','Open dashboard',()=>setView('home'),'default'],['Open Plan','Open calendar',()=>setView('plan'),'default'],['Open Notes','Open notes',()=>setView('notes'),'default'],['Open Think','Open brainstorm boards',()=>setView('think'),'default'],['Open Review','Review your week',()=>setView('review'),'default'],['Add Task','Create an untimed task',()=>newTask(),'default'],['Reset Data','Delete all saved app data',()=>openResetDataFlow(),'danger']];$('#paletteList').innerHTML=actions.map((a,i)=>`<button class="palette-item ${a[3]==='danger'?'danger':''}" data-pal="${i}"><b>${a[0]}</b><span class="muted"> · ${a[1]}</span></button>`).join('');$$('[data-pal]').forEach(x=>x.onclick=()=>{actions[+x.dataset.pal][2]();close('#palette')});$('#paletteSearch').value='';open('#palette');setTimeout(()=>$('#paletteSearch').focus(),50)}
 $('#paletteSearch').addEventListener('input',e=>{let q=e.target.value.toLowerCase();$$('[data-pal]').forEach(x=>x.style.display=x.textContent.toLowerCase().includes(q)?'block':'none')});
-$('#profileBtn').addEventListener('click',openAuth);
-$('#authForm').addEventListener('submit',handleAuthSubmit);
-$('#authModeToggle').addEventListener('click',()=>{authMode=authMode==='signin'?'signup':'signin';$('#authSubmit').textContent=authMode==='signup'?'Sign Up':'Sign In';$('#authModeToggle').textContent=authMode==='signup'?'Already have an account? Sign in':'Create an account';$('#authTitle').textContent=authMode==='signup'?'Create account':'Sign in';$('#authError').textContent=''});
-$('#signOutBtn').addEventListener('click',async()=>{if(supabaseClient)await supabaseClient.auth.signOut();else{currentUser=null;updateAuthUI();close('#authModal')}});
-$('#deleteAccountBtn').addEventListener('click',deleteAccount);
 $('#resetDataYesBtn').addEventListener('click',()=>{close('#resetDataConfirmModal');open('#resetDataFinalConfirmModal')});
 $('#resetDataFinalYesBtn').addEventListener('click',resetAllAppData);
+$('#authSignInTab').addEventListener('click',()=>setAuthMode('signin'));
+$('#authSignUpTab').addEventListener('click',()=>setAuthMode('signup'));
+$('#authForm').addEventListener('submit',e=>{e.preventDefault();authMode==='signin'?signIn():signUp()});
+$('#profileBtn').addEventListener('click',e=>{e.stopPropagation();$('#profileMenu').classList.toggle('open')});
+$('#signOutBtn').addEventListener('click',signOut);
+$('#deleteAccountBtn').addEventListener('click',deleteAccount);
+document.addEventListener('click',e=>{if(!e.target.closest('.profile-wrap'))$('#profileMenu')?.classList.remove('open')});
 $('#mobileWelcomeExploreBtn').addEventListener('click',()=>{localStorage.setItem(MOBILE_WELCOME_KEY,'1');close('#mobileWelcomeModal')});
 $('#mobileWelcomeResetBtn').addEventListener('click',()=>{localStorage.setItem(MOBILE_WELCOME_KEY,'1');resetAllAppData();close('#mobileWelcomeModal')});
 document.addEventListener('click',e=>{const closeBtn=e.target.closest('[data-close]');if(closeBtn){e.preventDefault();e.stopPropagation();const overlay=closeBtn.closest('.overlay');if(overlay){if(overlay.id==='mobileWelcomeModal')localStorage.setItem(MOBILE_WELCOME_KEY,'1');overlay.classList.remove('open')}}});
-document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openPalette()}if(e.key==='Escape'){if($('#mobileWelcomeModal')?.classList.contains('open'))localStorage.setItem(MOBILE_WELCOME_KEY,'1');$$('.overlay.open').forEach(x=>x.classList.remove('open'))}});window.addEventListener('resize',()=>{ $('#topTitle').textContent=''; $('#topCrumb').textContent=''; });$('#topTitle').textContent='';$('#topCrumb').textContent='';
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openPalette()}if(e.key==='Escape'){if($('#mobileWelcomeModal')?.classList.contains('open'))localStorage.setItem(MOBILE_WELCOME_KEY,'1');$$('.overlay.open').forEach(x=>x.classList.remove('open'))}});window.addEventListener('resize',()=>{ $('#topTitle').textContent='Block It'; $('#topCrumb').textContent=''; });$('#topTitle').textContent='Block It';$('#topCrumb').textContent='';
 document.addEventListener('click',e=>{const del=e.target.closest('#deleteBlockBtn');if(del){e.preventDefault();e.stopPropagation();const id=state.editing?.id;if(id)deleteBlock(id)}});
 $('#calendarSeg').addEventListener('click',e=>{let b=e.target.closest('[data-cal]');if(!b)return;state.cal=b.dataset.cal;renderPlan()});
 $('#resetCalendarBtn').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();open('#resetModal')});
 $('#confirmResetCalendar').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();data.blocks=[];data.tasks=[];stopFocus();state.editing=null;state.selectedDate=iso(new Date());state.cursor=new Date();save();close('#resetModal');render();showToast('Calendar reset')});
 // delegated block/task handlers
 $('#app').addEventListener('click',e=>{let del=e.target.closest('[data-task-delete]');if(del){e.preventDefault();e.stopPropagation();deleteTask(del.dataset.taskDelete);return}let b=e.target.closest('[data-block]');if(b){e.preventDefault();e.stopPropagation();openBlock(b.dataset.block);return}let completion=e.target.closest('[data-complete-type][data-complete-id]');if(completion){e.preventDefault();e.stopPropagation();let item=completion.dataset.completeType==='block'?data.blocks.find(x=>x.id===completion.dataset.completeId):data.tasks.find(x=>x.id===completion.dataset.completeId);if(item){item.done=!item.done;save();render();showToast(item.done?'Marked complete':'Marked incomplete')}return}let calendarTask=e.target.closest('.week-task,.agenda-item[data-task],.day-task');if(calendarTask){e.preventDefault();e.stopPropagation();editTask(calendarTask.dataset.task);return}let t=e.target.closest('[data-task]');if(t){e.preventDefault();e.stopPropagation();toggleTask(t.dataset.task)}});
-render();
-initializeAuth();
+initAuth();
 setTimeout(maybeShowMobileWelcome, 2000);
 })();
 </script>
