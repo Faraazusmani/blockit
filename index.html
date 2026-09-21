@@ -166,6 +166,7 @@ body.auth-locked .auth-overlay{display:flex}
     <div class="profile-email" id="profileEmail">Not signed in</div>
     <button id="signInBtn">Sign in</button>
     <button id="signOutBtn">Sign out</button>
+    <button id="resetPasswordBtn">Reset password</button>
     <button class="danger" id="deleteAccountBtn">Delete account</button>
   </div>
 </div>
@@ -297,6 +298,12 @@ function setAuthMode(mode){
   $('#authPassword').autocomplete=isResetPassword?'new-password':(mode==='signin'?'current-password':'new-password');
   $('#authPassword').required=!(isRecovery);
   $('#authPassword').minLength=isRecovery?0:6;
+  const subtitle=$('#authSubtitle');
+  if(subtitle){
+    if(isResetPassword){subtitle.textContent='Set a new password for your Block It account.';}
+    else if(isRecovery){subtitle.textContent='Enter your email to receive a password reset link.';}
+    else {subtitle.textContent='Log in to use this app across devices.';}
+  }
   if(isRecovery){
     $('#authPassword').value='';
     emailField.style.display='block';
@@ -349,6 +356,7 @@ function updateProfileUI(){
   const label=signedIn?`Signed in as ${getDisplayName(currentUser)}`:'Log in';
   const signInBtn=$('#signInBtn');
   const signOutBtn=$('#signOutBtn');
+  const resetPasswordBtn=$('#resetPasswordBtn');
   const deleteAccountBtn=$('#deleteAccountBtn');
   $('#profileEmail').textContent=signedIn ? email : 'Not signed in';
   $('#profileBtn').classList.toggle('visible',true);
@@ -357,6 +365,7 @@ function updateProfileUI(){
   $('#profileBtn').setAttribute('aria-label',label);
   if(signInBtn) signInBtn.style.display=signedIn ? 'none' : 'flex';
   if(signOutBtn) signOutBtn.style.display=signedIn ? 'flex' : 'none';
+  if(resetPasswordBtn) resetPasswordBtn.style.display=signedIn ? 'flex' : 'none';
   if(deleteAccountBtn) deleteAccountBtn.style.display=signedIn ? 'flex' : 'none';
 }
 async function loadUserData(user){
@@ -459,6 +468,27 @@ async function recoverPassword(){
   $('#authPassword').value='';
   setAuthMode('signin');
 }
+async function ensureRecoverySession(){
+  const search=new URLSearchParams(window.location.search);
+  const hash=new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const code=search.get('code') || hash.get('code') || null;
+  if(code){
+    const {data, error}=await supabase.auth.exchangeCodeForSession(code);
+    if(error){
+      console.error('Recovery code exchange failed:', error);
+      return null;
+    }
+    if(data?.session?.user){
+      currentUser=data.session.user;
+      authReady=true;
+      updateProfileUI();
+      return data.session;
+    }
+    return null;
+  }
+  const {data:{session}}=await supabase.auth.getSession();
+  return session;
+}
 async function setNewPassword(){
   if(!SUPABASE_CONFIGURED){showToast('Connect Supabase to change your password.');return}
   const password=$('#authPassword').value;
@@ -469,18 +499,52 @@ async function setNewPassword(){
   }
   $('#authMessage').textContent='Updating your password…';
   $('#authMessage').className='auth-message';
+  const session = await ensureRecoverySession();
+  if(!session){
+    $('#authMessage').textContent='Your recovery session expired. Please request a new reset link.';
+    $('#authMessage').className='auth-message error';
+    return;
+  }
   const {data,error}=await supabase.auth.updateUser({password});
   if(error){
     $('#authMessage').textContent=error.message;
     $('#authMessage').className='auth-message error';
     return;
   }
-  $('#authMessage').textContent='Password updated successfully. You can sign in now.';
-  $('#authMessage').className='auth-message';
-  setAuthMode('signin');
-  $('#authEmail').value=data?.user?.email || $('#authEmail').value;
+  const userEmail=data?.user?.email || $('#authEmail').value;
+  $('#authEmail').value=userEmail;
   $('#authPassword').value='';
-  setTimeout(()=>hideAuth(),1200);
+  setAuthMode('signin');
+  hideAuth();
+  showToast('Password updated successfully');
+  $('#authMessage').textContent='';
+  $('#authMessage').className='auth-message';
+}
+function startResetPasswordFlow(mode='reset-password'){
+  const email=currentUser?.email || $('#authEmail').value.trim();
+  $('#profileMenu')?.classList.remove('open');
+  if(mode==='reset-password'){
+    $('#authEmail').value=email;
+    setAuthMode('reset-password');
+    showAuth('Choose a new password to continue.');
+    $('#authMessage').textContent='Choose a new password for your account.';
+    $('#authMessage').className='auth-message';
+    $('#authPassword').focus();
+    return;
+  }
+  setAuthMode('recovery');
+  $('#authEmail').value=email;
+  showAuth('Enter your email to receive a reset link.');
+  $('#authMessage').textContent=email ? `We will send a reset link to ${email}.` : 'Enter your email to receive a reset link.';
+  $('#authMessage').className='auth-message';
+  $('#authEmail').focus();
+}
+function openPasswordResetFlow(){
+  if(currentUser){
+    startResetPasswordFlow('reset-password');
+    return;
+  }
+  startResetPasswordFlow('recovery');
 }
 async function signOut(){
   if(!SUPABASE_CONFIGURED)return;
@@ -517,16 +581,34 @@ async function initAuth(){
     render();
     return;
   }
+  const detectRecovery = ()=>{
+    const search=new URLSearchParams(window.location.search);
+    const hash=new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    return {
+      type: search.get('type') || hash.get('type') || null,
+      code: search.get('code') || hash.get('code') || null,
+      accessToken: search.get('access_token') || hash.get('access_token') || null,
+      refreshToken: search.get('refresh_token') || hash.get('refresh_token') || null
+    };
+  };
   supabase.auth.onAuthStateChange((event,session)=>{
+    const recovery=detectRecovery();
     if(event==='INITIAL_SESSION')return;
-    if(event==='PASSWORD_RECOVERY'){
-      currentUser=session?.user || currentUser;
-      authReady=true;
+    const isRecoveryFlow = event==='PASSWORD_RECOVERY' || recovery.type==='recovery' || !!recovery.code;
+    if(isRecoveryFlow){
+      const nextUser = session?.user || currentUser;
+      currentUser = nextUser || null;
+      authReady = true;
       updateProfileUI();
       setAuthMode('reset-password');
-      $('#authEmail').value=session?.user?.email || $('#authEmail').value || '';
-      $('#authPassword').value='';
+      $('#authEmail').value = currentUser?.email || $('#authEmail').value || '';
+      $('#authPassword').value = '';
       showAuth('Choose a new password to continue.');
+      $('#authMessage').textContent='Choose a new password for your account.';
+      $('#authMessage').className='auth-message';
+      if(recovery.code){
+        supabase.auth.exchangeCodeForSession(recovery.code).catch(err=>console.error('Recovery code exchange failed:',err));
+      }
       return;
     }
     if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){
@@ -535,10 +617,43 @@ async function initAuth(){
       clearUserData();
     }
   });
+  const recovery=detectRecovery();
   const {data:{session},error}=await supabase.auth.getSession();
   if(error){
     console.error(error);
     clearUserData();
+    return;
+  }
+  if(recovery.type==='recovery' || recovery.code){
+    if(recovery.code){
+      try{
+        const {data:recoverySession,error:recoveryError}=await supabase.auth.exchangeCodeForSession(recovery.code);
+        if(recoveryError){throw recoveryError;}
+        if(recoverySession?.user){
+          currentUser=recoverySession.user;
+          authReady=true;
+          updateProfileUI();
+          setAuthMode('reset-password');
+          $('#authEmail').value=currentUser.email || $('#authEmail').value || '';
+          $('#authPassword').value='';
+          showAuth('Choose a new password to continue.');
+          $('#authMessage').textContent='Choose a new password for your account.';
+          $('#authMessage').className='auth-message';
+          return;
+        }
+      }catch(err){
+        console.error('Recovery code exchange failed:',err);
+      }
+    }
+    currentUser=session?.user || currentUser;
+    authReady=true;
+    updateProfileUI();
+    setAuthMode('reset-password');
+    $('#authEmail').value=currentUser?.email || $('#authEmail').value || '';
+    $('#authPassword').value='';
+    showAuth('Choose a new password to continue.');
+    $('#authMessage').textContent='Choose a new password for your account.';
+    $('#authMessage').className='auth-message';
     return;
   }
   if(session?.user){
@@ -811,6 +926,7 @@ $('#signInBtn').addEventListener('click',()=>{
   showAuth('Log in to use this app across devices.');
 });
 $('#signOutBtn').addEventListener('click',signOut);
+$('#resetPasswordBtn').addEventListener('click',openPasswordResetFlow);
 $('#deleteAccountBtn').addEventListener('click',deleteAccount);
 document.addEventListener('click',e=>{if(!e.target.closest('.profile-wrap'))$('#profileMenu')?.classList.remove('open')});
 $('#mobileWelcomeExploreBtn').addEventListener('click',()=>{localStorage.setItem(MOBILE_WELCOME_KEY,'1');close('#mobileWelcomeModal')});
