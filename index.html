@@ -134,10 +134,15 @@ body.auth-locked .auth-overlay{display:flex}
 .auth-tabs button.active{background:var(--panel);color:var(--text);box-shadow:0 1px 5px #00000012}
 .auth-form{display:grid;gap:13px}
 .auth-field label{display:block;font-size:11px;color:var(--muted);font-weight:700;margin-bottom:7px}
+.auth-field input,.auth-field textarea,.auth-field select{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;background:#fafafd;color:var(--text);font-size:14px;line-height:1.4;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease}
+.auth-field input:focus,.auth-field textarea:focus,.auth-field select:focus{outline:none;border-color:#cfe0ff;background:#fff;box-shadow:0 0 0 4px rgba(0,122,255,.09)}
 .auth-password-wrap{position:relative}
-.auth-password-wrap input{width:100%;padding:12px 68px 12px 12px;border:1px solid var(--line);border-radius:11px;background:#fafafd;color:var(--text)}
-.password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:6px 8px;border-radius:8px;background:transparent;color:var(--blue);font-size:11px;font-weight:700}
-.password-toggle:hover{background:#f0f0f2}
+.auth-password-wrap input{width:100%;padding:12px 42px 12px 12px;border:1px solid var(--line);border-radius:11px;background:#fafafd;color:var(--text);-webkit-appearance:none;appearance:none}
+.auth-password-wrap input::-ms-reveal,.auth-password-wrap input::-ms-clear{display:none}
+.auth-password-wrap input::-webkit-credentials-auto-fill-button,.auth-password-wrap input::-webkit-clear-button,.auth-password-wrap input::-webkit-search-cancel-button{display:none !important;-webkit-appearance:none;appearance:none}
+.password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:28px;height:28px;padding:0;border-radius:8px;background:transparent;color:var(--text);display:inline-flex;align-items:center;justify-content:center;opacity:.75;z-index:2}
+.password-toggle svg{width:17px;height:17px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.password-toggle:hover{background:#f0f0f2;opacity:1}
 .auth-submit{height:42px;border-radius:11px;background:var(--yellow);color:#111;font-weight:800;margin-top:4px}
 .auth-message{min-height:18px;color:var(--muted);font-size:11px;line-height:1.45;margin-top:5px}
 .auth-message.error{color:var(--red)}
@@ -197,7 +202,9 @@ body.auth-locked .auth-overlay{display:flex}
         <label for="authPassword">Password</label>
         <div class="auth-password-wrap">
           <input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="At least 6 characters">
-          <button type="button" class="password-toggle" id="authPasswordToggle" aria-label="Show password">Show</button>
+          <button type="button" class="password-toggle" id="authPasswordToggle" aria-label="Show password">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
         </div>
       </div>
       <button class="auth-submit" id="authSubmit" type="submit">Sign In</button>
@@ -310,7 +317,7 @@ function setAuthMode(mode){
   $('#authPassword').type='password';
   const toggle=$('#authPasswordToggle');
   if(toggle){
-    toggle.textContent='Show';
+    toggle.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
     toggle.setAttribute('aria-label','Show password');
     toggle.style.display = isRecovery ? 'none' : 'inline-flex';
   }
@@ -608,28 +615,55 @@ async function initAuth(){
       refreshToken: search.get('refresh_token') || hash.get('refresh_token') || null
     };
   };
+  // supabase.auth.onAuthStateChange((event,session)=>{
+  //   const recovery=detectRecovery();
+  //   if(event==='INITIAL_SESSION')return;
+  //   const isRecoveryFlow = event==='PASSWORD_RECOVERY' || recovery.type==='recovery' || !!recovery.code;
+  //   if(isRecoveryFlow){
+  //     const nextUser = session?.user || currentUser;
+  //     currentUser = nextUser || null;
+  //     authReady = true;
+  //     updateProfileUI();
+  //     setAuthMode('reset-password');
+  //     $('#authEmail').value = currentUser?.email || $('#authEmail').value || '';
+  //     $('#authPassword').value = '';
+  //     showAuth('Choose a new password to continue.');
+  //     $('#authMessage').textContent='Choose a new password for your account.';
+  //     $('#authMessage').className='auth-message';
+  //     if(recovery.code){
+  //       supabase.auth.exchangeCodeForSession(recovery.code).catch(err=>console.error('Recovery code exchange failed:',err));
+  //     }
+  //     return;
+  //   }
+  //   if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){
+  //     if(session?.user)loadUserData(session.user);
+  //   }else if(event==='SIGNED_OUT'){
+  //     clearUserData();
+  //   }
+  // });
   supabase.auth.onAuthStateChange((event,session)=>{
-    const recovery=detectRecovery();
     if(event==='INITIAL_SESSION')return;
-    const isRecoveryFlow = event==='PASSWORD_RECOVERY' || recovery.type==='recovery' || !!recovery.code;
-    if(isRecoveryFlow){
-      const nextUser = session?.user || currentUser;
-      currentUser = nextUser || null;
-      authReady = true;
+    if(event==='PASSWORD_RECOVERY'){
+      currentUser=session?.user || currentUser;
+      authReady=true;
       updateProfileUI();
       setAuthMode('reset-password');
-      $('#authEmail').value = currentUser?.email || $('#authEmail').value || '';
-      $('#authPassword').value = '';
+      $('#authEmail').value=session?.user?.email || $('#authEmail').value || '';
+      $('#authPassword').value='';
       showAuth('Choose a new password to continue.');
-      $('#authMessage').textContent='Choose a new password for your account.';
-      $('#authMessage').className='auth-message';
-      if(recovery.code){
-        supabase.auth.exchangeCodeForSession(recovery.code).catch(err=>console.error('Recovery code exchange failed:',err));
-      }
       return;
     }
-    if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){
-      if(session?.user)loadUserData(session.user);
+    
+    if(event==='SIGNED_IN' || event==='TOKEN_REFRESHED' || event==='USER_UPDATED'){
+      if(session?.user) {
+        // FIX: If the user is already in memory (tab switch), silently update and stop.
+        if (currentUser && currentUser.id === session.user.id) {
+          currentUser = session.user;
+          return; 
+        }
+        // Otherwise, it is a fresh login, so show the loading screen.
+        loadUserData(session.user);
+      }
     }else if(event==='SIGNED_OUT'){
       clearUserData();
     }
@@ -941,7 +975,7 @@ $('#authPasswordToggle').addEventListener('click',()=>{
   if(!input||!toggle)return;
   const shouldShow=input.type==='password';
   input.type=shouldShow?'text':'password';
-  toggle.textContent=shouldShow?'Hide':'Show';
+  toggle.innerHTML = shouldShow ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.58 10.58A2 2 0 0 0 13.42 13.42"></path><path d="M10.88 5.66A10.94 10.94 0 0 1 12 5c6.5 0 10 7 10 7a18.43 18.43 0 0 1-4.22 5.11"></path><path d="M6.15 6.15A17.82 17.82 0 0 0 2 12s3.5 7 10 7c1.72 0 3.22-.35 4.5-.93"></path></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
   toggle.setAttribute('aria-label',shouldShow?'Hide password':'Show password');
   input.focus();
 });
