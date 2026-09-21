@@ -188,10 +188,14 @@ body.auth-locked .auth-overlay{display:flex}
       <button type="button" id="authSignUpTab">Sign Up</button>
     </div>
     <form class="auth-form" id="authForm">
-      <div class="auth-field"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div>
-      <div class="auth-field"><label for="authPassword">Password</label><input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="At least 6 characters"></div>
+      <div class="auth-field" id="authEmailField"><label for="authEmail">Email</label><input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+      <div class="auth-field" id="authPasswordField"><label for="authPassword">Password</label><input id="authPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="At least 6 characters"></div>
       <button class="auth-submit" id="authSubmit" type="submit">Sign In</button>
       <div class="auth-message" id="authMessage" role="status"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <button type="button" class="link" id="authForgotPasswordBtn" style="padding:0;border:0;background:none;text-align:left;">Forgot password?</button>
+        <button type="button" class="link" id="authBackToSignInBtn" style="display:none;padding:0;border:0;background:none;text-align:left;">Back to sign in</button>
+      </div>
     </form>
   </div>
 </div>
@@ -283,10 +287,40 @@ const MOBILE_WELCOME_KEY='blockit-mobile-welcome-seen';
 let authMode='signin';
 function setAuthMode(mode){
   authMode=mode;
+  const emailField=$('#authEmailField');
+  const passwordField=$('#authPasswordField');
+  const isRecovery=mode==='recovery';
+  const isResetPassword=mode==='reset-password';
   $('#authSignInTab').classList.toggle('active',mode==='signin');
   $('#authSignUpTab').classList.toggle('active',mode==='signup');
-  $('#authSubmit').textContent=mode==='signin'?'Sign In':'Sign Up';
-  $('#authPassword').autocomplete=mode==='signin'?'current-password':'new-password';
+  $('#authSubmit').textContent=isRecovery?'Send recovery link':(isResetPassword?'Set new password':(mode==='signin'?'Sign In':'Sign Up'));
+  $('#authPassword').autocomplete=isResetPassword?'new-password':(mode==='signin'?'current-password':'new-password');
+  $('#authPassword').required=!(isRecovery);
+  $('#authPassword').minLength=isRecovery?0:6;
+  if(isRecovery){
+    $('#authPassword').value='';
+    emailField.style.display='block';
+    passwordField.style.display='none';
+    $('#authPassword').removeAttribute('required');
+    $('#authPassword').setAttribute('aria-hidden','true');
+    $('#authPassword').setAttribute('tabindex','-1');
+  }else if(isResetPassword){
+    emailField.style.display='none';
+    passwordField.style.display='block';
+    $('#authPassword').setAttribute('required','required');
+    $('#authPassword').placeholder='Choose a new password';
+    $('#authPassword').setAttribute('aria-hidden','false');
+    $('#authPassword').removeAttribute('tabindex');
+  }else{
+    emailField.style.display='block';
+    passwordField.style.display='block';
+    $('#authPassword').setAttribute('required','required');
+    $('#authPassword').placeholder='At least 6 characters';
+    $('#authPassword').setAttribute('aria-hidden','false');
+    $('#authPassword').removeAttribute('tabindex');
+  }
+  $('#authForgotPasswordBtn').style.display=(mode==='signin'||mode==='signup')?'inline':'none';
+  $('#authBackToSignInBtn').style.display=(mode==='recovery'||mode==='reset-password')?'inline':'none';
   $('#authMessage').textContent='';
   $('#authMessage').className='auth-message';
 }
@@ -302,6 +336,7 @@ function showAuth(message=''){
   document.body.classList.add('auth-locked');
   $('#authOverlay').style.display='flex';
   $('#authMessage').textContent=message;
+  $('#authMessage').className='auth-message';
 }
 function hideAuth(){
   document.body.classList.remove('auth-locked');
@@ -401,6 +436,52 @@ async function signUp(){
     $('#authMessage').textContent='Account created. Check your email to confirm your address, then sign in.';
   }
 }
+async function recoverPassword(){
+  if(!SUPABASE_CONFIGURED){showToast('Connect Supabase to enable password recovery.');return}
+  const email=$('#authEmail').value.trim();
+  if(!email){
+    $('#authMessage').textContent='Enter your email address first.';
+    $('#authMessage').className='auth-message error';
+    return;
+  }
+  $('#authMessage').textContent='Sending recovery email…';
+  $('#authMessage').className='auth-message';
+  const {error}=await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+  if(error){
+    $('#authMessage').textContent=error.message;
+    $('#authMessage').className='auth-message error';
+    return;
+  }
+  $('#authMessage').textContent='Recovery email sent. Check your inbox and follow the link to set a new password.';
+  $('#authMessage').className='auth-message';
+  $('#authPassword').value='';
+  setAuthMode('signin');
+}
+async function setNewPassword(){
+  if(!SUPABASE_CONFIGURED){showToast('Connect Supabase to change your password.');return}
+  const password=$('#authPassword').value;
+  if(!password || password.length < 6){
+    $('#authMessage').textContent='Choose a password with at least 6 characters.';
+    $('#authMessage').className='auth-message error';
+    return;
+  }
+  $('#authMessage').textContent='Updating your password…';
+  $('#authMessage').className='auth-message';
+  const {data,error}=await supabase.auth.updateUser({password});
+  if(error){
+    $('#authMessage').textContent=error.message;
+    $('#authMessage').className='auth-message error';
+    return;
+  }
+  $('#authMessage').textContent='Password updated successfully. You can sign in now.';
+  $('#authMessage').className='auth-message';
+  setAuthMode('signin');
+  $('#authEmail').value=data?.user?.email || $('#authEmail').value;
+  $('#authPassword').value='';
+  setTimeout(()=>hideAuth(),1200);
+}
 async function signOut(){
   if(!SUPABASE_CONFIGURED)return;
   $('#profileMenu').classList.remove('open');
@@ -438,6 +519,16 @@ async function initAuth(){
   }
   supabase.auth.onAuthStateChange((event,session)=>{
     if(event==='INITIAL_SESSION')return;
+    if(event==='PASSWORD_RECOVERY'){
+      currentUser=session?.user || currentUser;
+      authReady=true;
+      updateProfileUI();
+      setAuthMode('reset-password');
+      $('#authEmail').value=session?.user?.email || $('#authEmail').value || '';
+      $('#authPassword').value='';
+      showAuth('Choose a new password to continue.');
+      return;
+    }
     if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'||event==='USER_UPDATED'){
       if(session?.user)loadUserData(session.user);
     }else if(event==='SIGNED_OUT'){
@@ -703,7 +794,9 @@ $('#resetDataYesBtn').addEventListener('click',()=>{close('#resetDataConfirmModa
 $('#resetDataFinalYesBtn').addEventListener('click',resetAllAppData);
 $('#authSignInTab').addEventListener('click',()=>setAuthMode('signin'));
 $('#authSignUpTab').addEventListener('click',()=>setAuthMode('signup'));
-$('#authForm').addEventListener('submit',e=>{e.preventDefault();authMode==='signin'?signIn():signUp()});
+$('#authForgotPasswordBtn').addEventListener('click',()=>{setAuthMode('recovery');$('#authMessage').textContent='Enter your email to receive a reset link.';$('#authMessage').className='auth-message';$('#authEmail').focus();});
+$('#authBackToSignInBtn').addEventListener('click',()=>{setAuthMode('signin');$('#authEmail').focus();});
+$('#authForm').addEventListener('submit',e=>{e.preventDefault(); if(authMode==='recovery'){recoverPassword();return;} if(authMode==='reset-password'){setNewPassword();return;} authMode==='signin'?signIn():signUp();});
 $('#profileBtn').addEventListener('click',e=>{
   e.stopPropagation();
   if(!currentUser){
